@@ -9,7 +9,7 @@ export const Footer = () => {
           <div className="flex items-center space-x-2">
             <Flower2 className="h-6 w-6 text-primary" strokeWidth={1.5} />
             <span className="font-serif text-lg font-bold tracking-wide text-textMain">
-              ARTISAN BLOOM
+              THE CRAFTNEST
             </span>
           </div>
           
@@ -20,7 +20,7 @@ export const Footer = () => {
           </div>
           
           <div className="text-sm text-textLight">
-            &copy; {new Date().getFullYear()} Artisan Bloom. Crafted with care.
+            &copy; {new Date().getFullYear()} The CraftNest. Crafted with care.
           </div>
         </div>
       </div>

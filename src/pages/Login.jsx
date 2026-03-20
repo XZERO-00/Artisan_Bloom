@@ -38,7 +38,7 @@ export const Login = () => {
         
         <div className="text-center mb-8">
           <h1 className="text-3xl font-serif font-bold text-textMain mb-2">Welcome Back</h1>
-          <p className="text-textLight text-sm">Sign in to your Artisan Bloom account.</p>
+          <p className="text-textLight text-sm">Sign in to your The CraftNest account.</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-5">
@@ -49,7 +49,7 @@ export const Login = () => {
               required 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="hello@artisanbloom.com" 
+              placeholder="hello@thecraftnest.com" 
               className="w-full bg-background border border-primary/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
             />
           </div>

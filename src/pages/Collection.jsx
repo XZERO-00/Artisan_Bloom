@@ -5,20 +5,11 @@ import { ProductCard } from '../components/shop/ProductCard';
 import { ProductSkeleton } from '../components/shop/ProductSkeleton';
 import { Link, useLocation } from 'react-router-dom';
 
-const mockProducts = [
-  { id: 1, name: 'Ocean Blue Coaster Set', price: 45, image: 'https://picsum.photos/seed/resin1/500/500', category: 'resin', tags: ['blue', 'coaster', 'ocean', 'home'] },
-  { id: 2, name: 'Geometric Display Tray', price: 68, image: 'https://picsum.photos/seed/resin2/500/500', category: 'resin', tags: ['geometric', 'tray', 'display', 'modern'] },
-  { id: 3, name: 'Initial Keychains', price: 45, image: 'https://picsum.photos/seed/keychain/500/500', category: 'resin', tags: ['keychain', 'initial', 'personal', 'glitter'] },
-  { id: 4, name: 'Decorite Wall Hanging', price: 60, image: 'https://picsum.photos/seed/wallart/500/500', category: 'lippan', tags: ['wall', 'hanging', 'decor', 'floral'] },
-  { id: 5, name: 'Rose Bouquet', price: 55, image: 'https://picsum.photos/seed/bouquet1/500/500', category: 'bouquets', tags: ['rose', 'bouquet', 'floral', 'red'] },
-  { id: 6, name: 'Dried Flower Bouquet', price: 40, image: 'https://picsum.photos/seed/bouquet2/500/500', category: 'bouquets', tags: ['dried', 'flower', 'rustic', 'boho'] },
-  { id: 7, name: 'Custom 3D Figurine', price: 85, image: 'https://picsum.photos/seed/3dtoy/500/500', category: '3d-printing', tags: ['3d', 'figurine', 'custom', 'toy'] },
-  { id: 8, name: 'Wooden LED Nameplate', price: 95, image: 'https://picsum.photos/seed/nameplate/500/500', category: 'nameplates', tags: ['wooden', 'led', 'nameplate', 'office'] },
-];
-
 export const Collection = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [sortBy, setSortBy] = useState('featured');
+  const [products, setProducts] = useState([]);
   const location = useLocation();
 
   const searchParams = new URLSearchParams(location.search);
@@ -27,14 +18,24 @@ export const Collection = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 600); // Simulate network fetch/delay for skeleton presentation
-    return () => clearTimeout(timer);
+    
+    // Simulate an external API fetch to our JSON database
+    fetch('/api/products.json')
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data);
+        // Minimum delay to show off the skeleton loading state
+        setTimeout(() => setIsLoading(false), 500);
+      })
+      .catch(error => {
+        console.error("Error fetching products from Faux API:", error);
+        setIsLoading(false);
+      });
+      
   }, [rawSearchQuery, initialCategory]);
 
   const filteredProducts = useMemo(() => {
-    let result = mockProducts;
+    let result = [...products];
     
     // Process explicit category URLs
     if (initialCategory && initialCategory !== 'all') {
@@ -50,9 +51,31 @@ export const Collection = () => {
             p.tags.some(tag => tag.toLowerCase().includes(q))
         );
     }
+    // Sorting logic
+    switch (sortBy) {
+      case 'price-asc':
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-desc':
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case 'author-asc':
+        result.sort((a, b) => a.author.localeCompare(b.author));
+        break;
+      case 'author-desc':
+        result.sort((a, b) => b.author.localeCompare(a.author));
+        break;
+      case 'reviews-desc':
+        result.sort((a, b) => b.rating - a.rating);
+        break;
+      default:
+        // 'featured' - maintain default order (by id)
+        result.sort((a, b) => a.id - b.id);
+        break;
+    }
     
     return result;
-  }, [rawSearchQuery, initialCategory]);
+  }, [rawSearchQuery, initialCategory, sortBy]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -111,12 +134,22 @@ export const Collection = () => {
         {/* Product Grid */}
         <div className="lg:w-3/4">
           
-          <div className="hidden lg:flex justify-end mb-6 space-x-3">
-             {['Price', 'Color', 'Bestselling'].map(filter => (
-                <button key={filter} className="flex items-center bg-surface px-4 py-2 rounded-full text-sm font-medium shadow-sm border border-black/5 hover:bg-background transition-colors">
-                  {filter} <ChevronDown className="w-4 h-4 ml-2 text-textLight" />
-                </button>
-             ))}
+          <div className="hidden lg:flex justify-end mb-6 space-x-3 items-center">
+             <label htmlFor="sort-select" className="text-sm font-medium text-textLight mr-2">Sort By:</label>
+             <select 
+               id="sort-select"
+               value={sortBy}
+               onChange={(e) => setSortBy(e.target.value)}
+               className="bg-surface px-4 py-2 rounded-full text-sm font-medium shadow-sm border border-black/5 hover:bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 appearance-none cursor-pointer"
+               style={{ backgroundImage: 'none' }} // Hide default arrow as we might want a custom one, but standard is fine mostly
+             >
+               <option value="featured">Featured</option>
+               <option value="price-asc">Price: Low to High</option>
+               <option value="price-desc">Price: High to Low</option>
+               <option value="author-asc">Author: A - Z</option>
+               <option value="author-desc">Author: Z - A</option>
+               <option value="reviews-desc">Highest Rated</option>
+             </select>
           </div>
 
           <AnimatePresence mode="wait">

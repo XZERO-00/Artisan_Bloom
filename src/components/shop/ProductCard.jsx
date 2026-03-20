@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Star } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useCartStore } from '../../store/useCartStore';
+import { ProductQuickView } from './ProductQuickView';
 import toast from 'react-hot-toast';
 
 export const ProductCard = ({ product }) => {
   const addToCart = useCartStore((state) => state.addToCart);
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -47,7 +50,7 @@ export const ProductCard = ({ product }) => {
           <Button 
             variant="secondary" 
             className="w-full lg:w-auto min-h-[44px] flex items-center justify-center !py-1.5 !px-3 text-xs bg-surface/90 backdrop-blur"
-            onClick={(e) => { e.preventDefault(); toast("Quick View not implemented in demo", { icon: "👁️" }); }}
+            onClick={(e) => { e.preventDefault(); setIsQuickViewOpen(true); }}
           >
             QUICK VIEW
           </Button>
@@ -63,8 +66,17 @@ export const ProductCard = ({ product }) => {
       
       <div className="text-center w-full px-2 mt-auto">
         <h3 className="text-sm font-medium text-textMain uppercase tracking-wide truncate mb-1">{product.name}</h3>
-        <p className="text-sm font-semibold text-textMain">${product.price.toFixed(2)}</p>
+        {product.author && <p className="text-xs text-textLight mb-1">By {product.author}</p>}
+        {product.rating && (
+          <div className="flex items-center justify-center mb-1 text-[#DFAA9D]">
+            <Star className="w-3 h-3 block" fill="currentColor" />
+            <span className="text-xs text-textMain ml-1 font-medium">{product.rating}</span>
+            <span className="text-xs text-textLight ml-1">({product.reviewCount})</span>
+          </div>
+        )}
+        <p className="text-sm font-semibold text-textMain">₹{product.price.toFixed(2)}</p>
       </div>
+      <ProductQuickView product={product} isOpen={isQuickViewOpen} onClose={() => setIsQuickViewOpen(false)} />
     </motion.div>
   );
 };

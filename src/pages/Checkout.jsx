@@ -97,7 +97,7 @@ export const Checkout = () => {
                   <p className="text-xs text-textLight">Qty {item.quantity}</p>
                 </div>
                 <div className="font-semibold text-textMain text-sm">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  ₹{(item.price * item.quantity).toFixed(2)}
                 </div>
               </div>
             ))}
@@ -106,15 +106,15 @@ export const Checkout = () => {
           <div className="bg-surface p-6 rounded-3xl shadow-sm border border-black/5">
              <div className="flex justify-between items-center mb-3 text-textMain text-sm">
                 <span>Subtotal</span>
-                <span className="font-semibold">${subtotal.toFixed(2)}</span>
+                <span className="font-semibold">₹{subtotal.toFixed(2)}</span>
              </div>
              <div className="flex justify-between items-center mb-4 text-textMain text-sm border-b border-black/5 pb-4">
                 <span>Shipping</span>
-                <span className="font-semibold">${shipping.toFixed(2)}</span>
+                <span className="font-semibold">₹{shipping.toFixed(2)}</span>
              </div>
              <div className="flex justify-between items-center text-lg font-serif text-textMain font-bold">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>₹{total.toFixed(2)}</span>
              </div>
           </div>
         </motion.div>
@@ -209,7 +209,7 @@ export const Checkout = () => {
                     className={`w-full !py-4 text-sm tracking-wide shadow-md min-h-[50px] ${isProcessing ? 'opacity-70 cursor-not-allowed' : 'bg-[#F47C62] hover:bg-[#F47C62]/90'}`}
                     disabled={cart.length === 0 || isProcessing}
                   >
-                    {isProcessing ? 'PROCESSING...' : `PLACE ORDER & PAY $${total.toFixed(2)}`}
+                    {isProcessing ? 'PROCESSING...' : `PLACE ORDER & PAY ₹${total.toFixed(2)}`}
                   </Button>
                 </div>
                 

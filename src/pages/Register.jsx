@@ -61,7 +61,7 @@ export const Register = () => {
         
         <div className="text-center mb-8">
           <h1 className="text-3xl font-serif font-bold text-textMain mb-2">Create Account</h1>
-          <p className="text-textLight text-sm">Join the Artisan Bloom community.</p>
+          <p className="text-textLight text-sm">Join The CraftNest community.</p>
         </div>
 
         <form onSubmit={handleRegister} className="space-y-4">
@@ -87,7 +87,7 @@ export const Register = () => {
               required 
               value={formData.email}
               onChange={handleChange}
-              placeholder="hello@artisanbloom.com" 
+              placeholder="hello@thecraftnest.com" 
               className="w-full bg-background border border-primary/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
             />
           </div>

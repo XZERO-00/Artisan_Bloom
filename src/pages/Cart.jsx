@@ -52,7 +52,7 @@ export const Cart = () => {
                     
                     <div className="flex-1 w-full">
                       <h3 className="text-lg font-medium text-textMain uppercase tracking-wide truncate">{item.name}</h3>
-                      <p className="font-semibold text-textMain mt-1">${item.price.toFixed(2)}</p>
+                      <p className="font-semibold text-textMain mt-1">₹{item.price.toFixed(2)}</p>
                     </div>
 
                     <div className="flex w-full sm:w-auto items-center justify-between sm:justify-start space-x-0 sm:space-x-4 mt-2 sm:mt-0">
@@ -93,16 +93,16 @@ export const Cart = () => {
            <div className="bg-surface p-8 rounded-[2rem] shadow-sm border border-black/5 sticky top-28">
               <div className="flex justify-between items-center mb-4 text-textMain">
                 <span className="font-medium">Subtotal</span>
-                <span className="font-semibold">${subtotal.toFixed(2)}</span>
+                <span className="font-semibold">₹{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center mb-6 text-textMain border-b border-black/5 pb-6">
                 <span className="font-medium">Shipping</span>
-                <span className="font-semibold">{subtotal > 0 ? `$${shipping.toFixed(2)}` : '—'}</span>
+                <span className="font-semibold">{subtotal > 0 ? `₹${shipping.toFixed(2)}` : '—'}</span>
               </div>
               
               <div className="flex justify-between items-center mb-8 text-xl font-serif text-textMain font-bold">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>₹{total.toFixed(2)}</span>
               </div>
 
               <div className="mb-8 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-2">

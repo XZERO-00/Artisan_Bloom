@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "name": "Ocean Blue Coaster Set",
+    "price": 45,
+    "image": "https://picsum.photos/seed/resin1/500/500",
+    "category": "resin",
+    "tags": ["blue", "coaster", "ocean", "home"],
+    "author": "Sarah Jenkins",
+    "rating": 4.5,
+    "reviewCount": 12
+  },
+  {
+    "id": 2,
+    "name": "Geometric Display Tray",
+    "price": 68,
+    "image": "https://picsum.photos/seed/resin2/500/500",
+    "category": "resin",
+    "tags": ["geometric", "tray", "display", "modern"],
+    "author": "Michael Chen",
+    "rating": 5.0,
+    "reviewCount": 8
+  },
+  {
+    "id": 3,
+    "name": "Initial Keychains",
+    "price": 45,
+    "image": "https://picsum.photos/seed/keychain/500/500",
+    "category": "resin",
+    "tags": ["keychain", "initial", "personal", "glitter"],
+    "author": "Emma Watson",
+    "rating": 4.2,
+    "reviewCount": 24
+  },
+  {
+    "id": 4,
+    "name": "Decorite Wall Hanging",
+    "price": 60,
+    "image": "https://picsum.photos/seed/wallart/500/500",
+    "category": "lippan",
+    "tags": ["wall", "hanging", "decor", "floral"],
+    "author": "Aarti Patel",
+    "rating": 4.8,
+    "reviewCount": 15
+  },
+  {
+    "id": 5,
+    "name": "Rose Bouquet",
+    "price": 55,
+    "image": "https://picsum.photos/seed/bouquet1/500/500",
+    "category": "bouquets",
+    "tags": ["rose", "bouquet", "floral", "red"],
+    "author": "Elena Rodriguez",
+    "rating": 4.9,
+    "reviewCount": 30
+  },
+  {
+    "id": 6,
+    "name": "Dried Flower Bouquet",
+    "price": 40,
+    "image": "https://picsum.photos/seed/bouquet2/500/500",
+    "category": "bouquets",
+    "tags": ["dried", "flower", "rustic", "boho"],
+    "author": "Elena Rodriguez",
+    "rating": 4.6,
+    "reviewCount": 18
+  },
+  {
+    "id": 7,
+    "name": "Custom 3D Figurine",
+    "price": 85,
+    "image": "https://picsum.photos/seed/3dtoy/500/500",
+    "category": "3d-printing",
+    "tags": ["3d", "figurine", "custom", "toy"],
+    "author": "David Kim",
+    "rating": 4.7,
+    "reviewCount": 22
+  },
+  {
+    "id": 8,
+    "name": "Wooden LED Nameplate",
+    "price": 95,
+    "image": "https://picsum.photos/seed/nameplate/500/500",
+    "category": "nameplates",
+    "tags": ["wooden", "led", "nameplate", "office"],
+    "author": "Sarah Jenkins",
+    "rating": 4.9,
+    "reviewCount": 40
+  }
+]

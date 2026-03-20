@@ -18,6 +18,7 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
+  const currentPath = location.pathname + location.search;
   const cartItemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const navLinks = [
@@ -63,16 +64,18 @@ export const Navbar = () => {
   }, []);
 
   return (
-    <motion.nav 
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ type: "spring", stiffness: 100, damping: 20 }}
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-background/95 backdrop-blur-md shadow-md border-b-transparent' 
-          : 'bg-background/80 backdrop-blur-sm border-b border-surface/50'
-      }`}
-    >
+    <>
+      <div className="h-20 w-full shrink-0"></div>
+      <motion.nav 
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+          isScrolled 
+            ? 'bg-background/95 backdrop-blur-md shadow-md border-b-transparent' 
+            : 'bg-background/80 backdrop-blur-sm border-b border-surface/50'
+        }`}
+      >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           
@@ -80,32 +83,38 @@ export const Navbar = () => {
           <Link to="/" className="flex items-center space-x-2 shrink-0">
             <Flower2 className="h-8 w-8 text-primary" strokeWidth={1.5} />
             <div className="flex flex-col">
-              <span className="font-serif text-xl font-bold leading-none tracking-wide text-textMain">ARTISAN</span>
-              <span className="font-serif text-[0.8rem] leading-none tracking-widest text-textLight">BLOOM</span>
+              <span className="font-serif text-xl font-bold leading-none tracking-wide text-textMain">THE CRAFT</span>
+              <span className="font-serif text-[0.8rem] leading-none tracking-widest text-textLight">NEST</span>
             </div>
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden lg:flex flex-1 justify-center space-x-1 mx-4">
-            <div className="bg-surface/60 backdrop-blur rounded-full px-2 py-1 flex items-center shadow-sm border border-black/5 whitespace-nowrap">
-              {navLinks.map((link, idx) => (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  className={`relative px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                    location.pathname === link.path && !link.path.includes('?') ? 'text-textMain' : 'text-textMain hover:bg-background'
-                  }`}
-                >
-                  {location.pathname === link.path && !link.path.includes('?') && (
-                    <motion.div
-                      layoutId="nav-pill"
-                      className="absolute inset-0 bg-[#DFAA9D]/20 rounded-full -z-10"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                    />
-                  )}
-                  {link.name}
-                </Link>
-              ))}
+          <div 
+             className="hidden lg:flex flex-1 mx-4 overflow-x-auto pb-1 -mb-1 custom-scrollbar-hide"
+             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <div className="bg-surface/60 backdrop-blur rounded-full px-2 py-1 flex items-center shadow-sm border border-black/5 whitespace-nowrap min-w-max m-auto">
+              {navLinks.map((link, idx) => {
+                const isActive = currentPath === link.path || (link.path === '/collections' && location.pathname === '/collections' && location.search === '');
+                return (
+                  <Link
+                    key={link.name}
+                    to={link.path}
+                    className={`relative px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                      isActive ? 'text-textMain' : 'text-textLight hover:text-textMain hover:bg-black/5'
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="nav-pill"
+                        className="absolute inset-0 bg-primary/15 rounded-full -z-10"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    {link.name}
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
@@ -253,16 +262,21 @@ export const Navbar = () => {
               </div>
 
               <div className="flex-1 overflow-y-auto py-4 px-4 space-y-1">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    to={link.path}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block px-4 py-3 rounded-xl text-base font-medium text-textMain hover:bg-surface transition-colors border-b border-black/5 last:border-0"
-                  >
-                    {link.name}
-                  </Link>
-                ))}
+                {navLinks.map((link) => {
+                  const isActive = currentPath === link.path || (link.path === '/collections' && location.pathname === '/collections' && location.search === '');
+                  return (
+                    <Link
+                      key={link.name}
+                      to={link.path}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors border-b border-black/5 last:border-0 ${
+                        isActive ? 'bg-primary/10 text-textMain font-bold' : 'text-textLight hover:bg-surface hover:text-textMain'
+                      }`}
+                    >
+                      {link.name}
+                    </Link>
+                  );
+                })}
               </div>
 
               {/* Drawer Footer / Auth */}
@@ -298,5 +312,6 @@ export const Navbar = () => {
         )}
       </AnimatePresence>
     </motion.nav>
+    </>
   );
 };

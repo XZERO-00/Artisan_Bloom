@@ -55,7 +55,7 @@ export const MyOrders = () => {
                   </div>
                 </div>
                 <div className="flex flex-col md:items-end text-sm">
-                   <div className="font-bold text-textMain">Total: ${order.total.toFixed(2)}</div>
+                   <div className="font-bold text-textMain">Total: ₹{order.total.toFixed(2)}</div>
                    <div className="flex items-center text-green-600 mt-1">
                      <span className="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
                      Processing
@@ -73,7 +73,7 @@ export const MyOrders = () => {
                       <p className="text-xs text-textLight mt-1">Qty: {item.quantity}</p>
                     </div>
                     <div className="font-semibold text-textMain text-sm">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ₹{(item.price * item.quantity).toFixed(2)}
                     </div>
                   </div>
                 ))}
