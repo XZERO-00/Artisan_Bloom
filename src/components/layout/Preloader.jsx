@@ -31,50 +31,43 @@ export const Preloader = ({ onComplete }) => {
             transition={{ duration: 1, ease: "easeOut" }}
             className="mb-8"
          >
-           <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#DFAA9D" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-             {/* Left Leaf */}
-             <motion.path 
-               initial={{ pathLength: 0 }}
-               animate={{ pathLength: 1 }}
-               transition={{ duration: 1.5, ease: "easeInOut", delay: 0.2 }}
-               d="M12 15c-3 0-5-2-5-5 0-3 2-5 5-5"
-             />
-             {/* Right Leaf */}
-             <motion.path 
-               initial={{ pathLength: 0 }}
-               animate={{ pathLength: 1 }}
-               transition={{ duration: 1.5, ease: "easeInOut", delay: 0.2 }}
-               d="M12 15c3 0 5-2 5-5 0-3-2-5-5-5"
-             />
-             {/* Center Bud */}
-             <motion.path 
-               initial={{ pathLength: 0 }}
-               animate={{ pathLength: 1 }}
-               transition={{ duration: 1.2, ease: "easeInOut", delay: 0.6 }}
-               d="M12 5v10"
-             />
-             {/* Bottom Left Petal */}
-             <motion.path 
-               initial={{ pathLength: 0 }}
-               animate={{ pathLength: 1 }}
-               transition={{ duration: 1.2, ease: "easeInOut", delay: 0.6 }}
-               d="M12 15c-2 2-3 4-3 6"
-             />
-             {/* Bottom Right Petal */}
-             <motion.path 
-               initial={{ pathLength: 0 }}
-               animate={{ pathLength: 1 }}
-               transition={{ duration: 1.2, ease: "easeInOut", delay: 0.6 }}
-               d="M12 15c2 2 3 4 3 6"
-             />
-             {/* Stem */}
-             <motion.path 
-               initial={{ pathLength: 0 }}
-               animate={{ pathLength: 1 }}
-               transition={{ duration: 1.5, ease: "easeInOut", delay: 0.8 }}
-               d="M12 21v2"
-             />
-           </svg>
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#DFAA9D" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              {/* Bottom Nest Foundation */}
+              <motion.path 
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 1.5, ease: "easeInOut", delay: 0.2 }}
+                d="M4 14c0 5 16 5 16 0"
+              />
+              {/* Inner Woven Twig */}
+              <motion.path 
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 1.3, ease: "easeInOut", delay: 0.4 }}
+                d="M6 12c0 4 12 4 12 0"
+              />
+              {/* Sweeping Overlapping Curve */}
+              <motion.path 
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 1.2, ease: "easeInOut", delay: 0.6 }}
+                d="M3 13q9 4 18-1"
+              />
+              {/* Craft Needle / Accent Twig */}
+              <motion.path 
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 1.0, ease: "easeInOut", delay: 0.8 }}
+                d="M17 6L8 16"
+              />
+              {/* Small Yarn / Egg element */}
+              <motion.path 
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.8, ease: "easeInOut", delay: 1.0 }}
+                d="M12 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"
+              />
+            </svg>
          </motion.div>
          
          <div className="overflow-hidden flex items-center justify-center mb-1">
@@ -84,7 +77,7 @@ export const Preloader = ({ onComplete }) => {
              transition={{ duration: 0.8, ease: [0.33, 1, 0.68, 1], delay: 0.4 }}
              className="text-4xl md:text-5xl font-serif text-textMain tracking-[0.2em] font-bold"
            >
-             ARTISAN
+             THE CRAFT
            </motion.h1>
          </div>
          <div className="overflow-hidden flex items-center justify-center">
@@ -94,7 +87,7 @@ export const Preloader = ({ onComplete }) => {
              transition={{ duration: 0.8, ease: [0.33, 1, 0.68, 1], delay: 0.6 }}
              className="text-4xl md:text-5xl font-serif text-[#DFAA9D] tracking-[0.2em]"
            >
-             BLOOM
+             NEST
            </motion.h1>
          </div>
          
