@@ -1,29 +1,49 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Star } from 'lucide-react';
+import { Star, MessageCircle } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useCartStore } from '../../store/useCartStore';
+import { useAuthStore } from '../../store/useAuthStore';
+import { useChatStore } from '../../store/useChatStore';
 import { ProductQuickView } from './ProductQuickView';
+import { ChatWidget } from '../chat/ChatWidget';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 export const ProductCard = ({ product }) => {
   const addToCart = useCartStore((state) => state.addToCart);
+  const { user, isAuthenticated } = useAuthStore();
+  const { getOrCreateThread } = useChatStore();
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatThreadId, setChatThreadId] = useState(null);
+  const navigate = useNavigate();
 
   const handleAddToCart = (e) => {
     e.preventDefault();
     addToCart(product);
     toast.success(`${product.name} added to cart!`, {
-      style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff',
-      },
-      iconTheme: {
-        primary: '#DFAA9D',
-        secondary: '#fff',
-      },
+      style: { borderRadius: '10px', background: '#333', color: '#fff' },
+      iconTheme: { primary: '#DFAA9D', secondary: '#fff' },
     });
+  };
+
+  const handleAskMaker = (e) => {
+    e.preventDefault();
+    if (!isAuthenticated) { navigate('/login'); return; }
+    if (user?.role === 'vendor' || user?.role === 'admin') {
+      toast.error('Only customers can message vendors.');
+      return;
+    }
+    const vendorId = product.vendorId || 'vendor-001';
+    const vendorName = product.vendorName || product.author || 'The Maker';
+    const threadId = getOrCreateThread({
+      customerId: user.id, customerName: user.name,
+      vendorId, vendorName,
+      productId: String(product.id), productName: product.name,
+    });
+    setChatThreadId(threadId);
+    setIsChatOpen(true);
   };
 
   return (
@@ -61,12 +81,21 @@ export const ProductCard = ({ product }) => {
           >
             ADD TO CART
           </Button>
+          <Button
+            variant="secondary"
+            className="w-full lg:w-auto min-h-[44px] flex items-center justify-center !py-1.5 !px-3 text-xs bg-surface/90 backdrop-blur gap-1"
+            onClick={handleAskMaker}
+          >
+            <MessageCircle className="w-3 h-3" /> ASK MAKER
+          </Button>
         </div>
       </div>
       
       <div className="text-center w-full px-2 mt-auto">
         <h3 className="text-sm font-medium text-textMain uppercase tracking-wide truncate mb-1">{product.name}</h3>
-        {product.author && <p className="text-xs text-textLight mb-1">By {product.author}</p>}
+        {(product.vendorName || product.author) && (
+          <p className="text-xs text-textLight mb-1">By {product.vendorName || product.author}</p>
+        )}
         {product.rating && (
           <div className="flex items-center justify-center mb-1 text-[#DFAA9D]">
             <Star className="w-3 h-3 block" fill="currentColor" />
@@ -77,6 +106,7 @@ export const ProductCard = ({ product }) => {
         <p className="text-sm font-semibold text-textMain">₹{product.price.toFixed(2)}</p>
       </div>
       <ProductQuickView product={product} isOpen={isQuickViewOpen} onClose={() => setIsQuickViewOpen(false)} />
+      <ChatWidget isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} initialThreadId={chatThreadId} />
     </motion.div>
   );
 };

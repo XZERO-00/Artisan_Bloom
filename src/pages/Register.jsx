@@ -10,7 +10,9 @@ export const Register = () => {
     email: '',
     phone: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    role: 'customer',
+    shopName: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -45,12 +47,15 @@ export const Register = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await authService.register(formData);
-      toast.success(response.message);
-      // Wait for toast then redirect
-      setTimeout(() => navigate('/login'), 1500);
+      await authService.register(formData);
+      toast.success('Account created! Please log in.');
+      setTimeout(() => navigate('/login'), 1200);
     } catch (error) {
-      toast.error(error.message || 'Registration failed.');
+      // Firebase sends descriptive error codes
+      const msg = error.code === 'auth/email-already-in-use'
+        ? 'This email is already registered.'
+        : error.message || 'Registration failed.';
+      toast.error(msg);
       setIsSubmitting(false);
     }
   };
@@ -62,6 +67,24 @@ export const Register = () => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-serif font-bold text-textMain mb-2">Create Account</h1>
           <p className="text-textLight text-sm">Join The CraftNest community.</p>
+        </div>
+
+        {/* Role Selector */}
+        <div className="flex rounded-2xl overflow-hidden border border-primary/20 mb-2">
+          <button type="button"
+            onClick={() => setFormData({...formData, role: 'customer'})}
+            className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+              formData.role === 'customer' ? 'bg-primary text-white' : 'text-textLight hover:bg-surface'
+            }`}>
+            🛍️ Customer
+          </button>
+          <button type="button"
+            onClick={() => setFormData({...formData, role: 'vendor'})}
+            className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+              formData.role === 'vendor' ? 'bg-primary text-white' : 'text-textLight hover:bg-surface'
+            }`}>
+            🛒 Vendor / Maker
+          </button>
         </div>
 
         <form onSubmit={handleRegister} className="space-y-4">
@@ -91,6 +114,20 @@ export const Register = () => {
               className="w-full bg-background border border-primary/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
             />
           </div>
+
+          {formData.role === 'vendor' && (
+            <div>
+              <label className="block text-xs font-bold tracking-wide uppercase mb-2 text-textMain">Shop Name</label>
+              <input 
+                type="text" 
+                name="shopName"
+                value={formData.shopName}
+                onChange={handleChange}
+                placeholder="e.g. Priya's Resin Studio" 
+                className="w-full bg-background border border-primary/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+              />
+            </div>
+          )}
 
           <div>
             <label className="block text-xs font-bold tracking-wide uppercase mb-2 text-textMain">Phone Number</label>

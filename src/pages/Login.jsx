@@ -19,12 +19,11 @@ export const Login = () => {
 
     try {
       const response = await authService.login(email, password);
-      // Simulate login delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      login(response.user, response.token);
-      toast.success('Welcome back!');
-      navigate('/');
+      login(response.firebaseUser, response.profile);
+      toast.success(`Welcome back, ${response.profile.name}!`);
+      // Route to role-specific dashboard
+      const role = response.profile.role || 'customer';
+      navigate(`/profile/${role}`);
     } catch (error) {
       toast.error(error.message || 'Invalid email or password.');
     } finally {

@@ -190,23 +190,39 @@ export const Navbar = () => {
                 </div>
               )}
               
-              {/* Profile Dropdown */}
               <AnimatePresence>
                 {isProfileOpen && isAuthenticated && (
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className="absolute right-0 top-full mt-2 w-48 bg-surface rounded-2xl shadow-md border border-black/5 overflow-hidden z-20"
+                    className="absolute right-0 top-full mt-2 w-52 bg-surface rounded-2xl shadow-md border border-black/5 overflow-hidden z-20"
                   >
                     <div className="px-4 py-3 border-b border-black/5 bg-background/50">
                       <p className="text-sm font-medium text-textMain truncate">{user?.name}</p>
                       <p className="text-xs text-textLight truncate">{user?.email}</p>
+                      <span className={`text-[0.6rem] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full mt-1 inline-block ${
+                        user?.role === 'admin' ? 'bg-red-100 text-red-600' :
+                        user?.role === 'vendor' ? 'bg-green-100 text-green-600' :
+                        'bg-primary/10 text-primary'
+                      }`}>{user?.role || 'customer'}</span>
                     </div>
                     <div className="py-2">
-                      <button className="w-full text-left px-4 py-2 text-sm text-textMain hover:bg-background transition-colors flex items-center" onClick={() => { setIsProfileOpen(false); navigate('/orders'); }}>
-                        <Package className="w-4 h-4 mr-2" /> My Orders
+                      <button 
+                        className="w-full text-left px-4 py-2 text-sm text-textMain hover:bg-background transition-colors flex items-center" 
+                        onClick={() => { 
+                          setIsProfileOpen(false); 
+                          const role = user?.role || 'customer';
+                          navigate(`/profile/${role}`);
+                        }}
+                      >
+                        <User className="w-4 h-4 mr-2" /> My Dashboard
                       </button>
+                      {user?.role === 'customer' && (
+                        <button className="w-full text-left px-4 py-2 text-sm text-textMain hover:bg-background transition-colors flex items-center" onClick={() => { setIsProfileOpen(false); navigate('/orders'); }}>
+                          <Package className="w-4 h-4 mr-2" /> My Orders
+                        </button>
+                      )}
                       <button className="w-full text-left px-4 py-2 text-sm text-[#F47C62] hover:bg-background transition-colors flex items-center" onClick={handleLogout}>
                         <LogOut className="w-4 h-4 mr-2" /> Logout
                       </button>

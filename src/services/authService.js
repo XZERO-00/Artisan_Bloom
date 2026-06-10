@@ -1,98 +1,101 @@
-import bcrypt from 'bcryptjs';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+} from 'firebase/auth';
+import {
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  updateDoc,
+  collection,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
 
-const USERS_DB_KEY = 'artisan_bloom_users';
+// ─── Helpers ────────────────────────────────────────────────────────────────
 
-// Helper to get users from localStorage
-const getUsers = () => {
-  const usersStr = localStorage.getItem(USERS_DB_KEY);
-  return usersStr ? JSON.parse(usersStr) : [];
+/** Fetch the public profile document for a given Firebase UID. */
+export const getUserProfile = async (uid) => {
+  const snap = await getDoc(doc(db, 'users', uid));
+  return snap.exists() ? { uid, ...snap.data() } : null;
 };
 
-// Helper to save users to localStorage
-const saveUsers = (users) => {
-  localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
-};
+// ─── Auth Service ────────────────────────────────────────────────────────────
 
 export const authService = {
-  // Register a new user
+  /**
+   * Register a new user.
+   * Creates a Firebase Auth account AND a Firestore `users/{uid}` document.
+   */
   register: async (userData) => {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 800));
+    const { email, password, fullName, phone, role = 'customer', shopName = '', shopBio = '' } = userData;
 
-    const users = getUsers();
-    
-    // Check if email already exists
-    if (users.some(u => u.email === userData.email)) {
-      throw new Error('This email is already registered.');
-    }
+    // 1. Create account in Firebase Auth
+    const credential = await createUserWithEmailAndPassword(auth, email, password);
+    const uid = credential.user.uid;
 
-    // Hash password
-    const salt = bcrypt.genSaltSync(10);
-    const password_hash = bcrypt.hashSync(userData.password, salt);
-
-    // Create new user record
-    const newUser = {
-      id: Date.now().toString(),
-      name: userData.fullName,
-      email: userData.email,
-      phone: userData.phone,
-      password_hash,
-      created_at: new Date().toISOString()
+    // 2. Write profile doc in Firestore
+    const profileDoc = {
+      name: fullName,
+      email,
+      phone,
+      role,
+      shopName: role === 'vendor' ? (shopName || `${fullName}'s Shop`) : null,
+      shopBio: role === 'vendor' ? (shopBio || '') : null,
+      avatar: null,
+      isApproved: true,   // Auto-approve; flip to false for manual vendor review workflow
+      isBanned: false,
+      createdAt: serverTimestamp(),
     };
 
-    // Save
-    users.push(newUser);
-    saveUsers(users);
+    await setDoc(doc(db, 'users', uid), profileDoc);
 
-    return { success: true, message: 'Registration successful!' };
+    return { success: true, message: 'Registration successful! Welcome to The CraftNest.' };
   },
 
-  // Login a user
+  /**
+   * Login an existing user.
+   * Returns the Firebase auth credential + the Firestore profile.
+   */
   login: async (email, password) => {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 800));
+    const credential = await signInWithEmailAndPassword(auth, email, password);
+    const profile = await getUserProfile(credential.user.uid);
 
-    const users = getUsers();
-    const user = users.find(u => u.email === email);
-
-    if (!user) {
-      throw new Error('Invalid email or password.');
-    }
-
-    // Verify password
-    const isMatch = bcrypt.compareSync(password, user.password_hash);
-    if (!isMatch) {
-      throw new Error('Invalid email or password.');
-    }
-
-    // Generate mock JWT token
-    const token = btoa(JSON.stringify({ userId: user.id, email: user.email, exp: Date.now() + 86400000 })); // Base64 encoded payload
+    if (!profile) throw new Error('Account profile not found. Please contact support.');
+    if (profile.isBanned) throw new Error('Your account has been suspended. Contact support.');
 
     return {
       success: true,
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone
-      }
+      firebaseUser: credential.user,
+      profile,
     };
   },
 
-  // Simulate Password Reset
-  resetPassword: async (email) => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Check if email exists to avoid leaking info in a real app this might just return success anyway
-    const users = getUsers();
-    const user = users.find(u => u.email === email);
-    
-    if (!user) {
-      // For security, often say 'If a matching account was found, an email was sent'
-      throw new Error('If a matching account was found, an email was sent.');
-    }
+  /** Sign the current user out of Firebase Auth. */
+  logout: async () => {
+    await signOut(auth);
+  },
 
+  /** Send a password reset email via Firebase Auth. */
+  resetPassword: async (email) => {
+    await sendPasswordResetEmail(auth, email);
     return { success: true, message: 'Password reset link sent to your email.' };
-  }
+  },
+
+  // ─── Admin-only helpers ─────────────────────────────────────────────────
+
+  /** Fetch all users (should only be called from AdminProfile behind role check). */
+  getAllUsers: async () => {
+    const snap = await getDocs(collection(db, 'users'));
+    return snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+  },
+
+  /** Update arbitrary fields on a user document (ban, approve, etc.). */
+  updateUserStatus: async (uid, updates) => {
+    await updateDoc(doc(db, 'users', uid), updates);
+    return { success: true };
+  },
 };
