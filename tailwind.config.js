@@ -4,19 +4,20 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        background: '#FAF8F5',
-        surface: '#FFFFFF',
-        primary: '#EAC8B9', // Soft pastel pink/beige button color
-        primaryHover: '#DFAA9D',
-        textMain: '#4A4A4A',
-        textLight: '#7A7A7A',
-        cardBeige: '#F1E9E4', // Resin card background
-        cardGreen: '#E0E7E2', // Bloom card background
-        cardBrown: '#DFD1CB', // Mind soul card
-        cardDarkBeige: '#DCCFC6', // Lippan card
+        background: 'rgb(var(--color-background) / <alpha-value>)',
+        surface: 'rgb(var(--color-surface) / <alpha-value>)',
+        primary: 'rgb(var(--color-primary) / <alpha-value>)',
+        primaryHover: 'rgb(var(--color-primary-hover) / <alpha-value>)',
+        textMain: 'rgb(var(--color-text-main) / <alpha-value>)',
+        textLight: 'rgb(var(--color-text-light) / <alpha-value>)',
+        cardBeige: 'rgb(var(--color-card-beige) / <alpha-value>)',
+        cardGreen: 'rgb(var(--color-card-green) / <alpha-value>)',
+        cardBrown: 'rgb(var(--color-card-brown) / <alpha-value>)',
+        cardDarkBeige: 'rgb(var(--color-card-dark-beige) / <alpha-value>)',
       },
       fontFamily: {
         serif: ['"Playfair Display"', 'serif'],

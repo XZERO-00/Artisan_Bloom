@@ -41,8 +41,9 @@ export const ForgotPassword = () => {
         {!isSubmitted ? (
           <form onSubmit={handleReset} className="space-y-5">
             <div>
-              <label className="block text-xs font-bold tracking-wide uppercase mb-2 text-textMain">Email Address</label>
+              <label htmlFor="email" className="block text-xs font-bold tracking-wide uppercase mb-2 text-textMain">Email Address</label>
               <input 
+                id="email"
                 type="email" 
                 required 
                 value={email}

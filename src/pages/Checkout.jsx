@@ -32,11 +32,18 @@ export const Checkout = () => {
 
     setIsProcessing(true);
 
-    const formData = new FormData(e.target);
-    const orderData = {
-      userId: user.uid,
-      userEmail: user.email,
-      items: cart.map(item => ({
+    let totalPlatformFee = 0;
+    let totalVendorEarnings = shipping; // Shipping goes to vendors
+
+    const items = cart.map(item => {
+      const itemTotal = item.price * item.quantity;
+      const platformFee = itemTotal * 0.10; // 10% commission
+      const vendorEarnings = itemTotal - platformFee;
+      
+      totalPlatformFee += platformFee;
+      totalVendorEarnings += vendorEarnings;
+      
+      return {
         id: String(item.id),
         name: item.name,
         image: item.image,
@@ -44,10 +51,24 @@ export const Checkout = () => {
         quantity: item.quantity,
         vendorId: item.vendorId || null,
         vendorName: item.vendorName || item.author || null,
-      })),
+        platformFee,
+        vendorEarnings
+      };
+    });
+
+    const vendorIds = [...new Set(items.map(i => i.vendorId).filter(Boolean))];
+
+    const formData = new FormData(e.target);
+    const orderData = {
+      userId: user.uid,
+      userEmail: user.email,
+      items,
+      vendorIds,
       total,
       subtotal,
       shipping,
+      platformFee: totalPlatformFee,
+      vendorEarnings: totalVendorEarnings,
       paymentMethod: formData.get('payment'),
       shippingAddress: {
         name: formData.get('fullName'),
@@ -138,17 +159,17 @@ export const Checkout = () => {
             <div className="space-y-6">
               <div>
                 <label className="block text-xs font-bold tracking-wide uppercase mb-2">Shipping Address</label>
-                <input type="text" name="fullName" required placeholder="FULL NAME"
+                <input type="text" name="fullName" required placeholder="FULL NAME" aria-label="Full Name"
                   className="w-full bg-background border border-primary/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#DFAA9D]/40 focus:border-[#DFAA9D] transition-all duration-300 mb-3 min-h-[44px]" />
-                <input type="text" name="address" required placeholder="SHIPPING ADDRESS"
+                <input type="text" name="address" required placeholder="SHIPPING ADDRESS" aria-label="Shipping Address"
                   className="w-full bg-background border border-primary/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#DFAA9D]/40 focus:border-[#DFAA9D] transition-all duration-300 mb-3 min-h-[44px]" />
                 <div className="flex flex-col sm:flex-row gap-3 mb-3">
-                  <input type="text" name="city" required placeholder="CITY"
+                  <input type="text" name="city" required placeholder="CITY" aria-label="City"
                     className="w-full sm:w-2/3 bg-background border border-primary/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#DFAA9D]/40 focus:border-[#DFAA9D] transition-all min-h-[44px]" />
-                  <input type="text" name="zipCode" required pattern="[0-9]{5,6}" title="5-6 digit PIN code" placeholder="PIN CODE"
+                  <input type="text" name="zipCode" required pattern="[0-9]{5,6}" title="5-6 digit PIN code" placeholder="PIN CODE" aria-label="Pin Code"
                     className="w-full sm:w-1/3 bg-background border border-primary/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#DFAA9D]/40 focus:border-[#DFAA9D] transition-all min-h-[44px]" />
                 </div>
-                <input type="tel" name="phone" required pattern="[0-9]{10}" title="10 digit phone number" placeholder="PHONE NUMBER (10 digits)"
+                <input type="tel" name="phone" required pattern="[0-9]{10}" title="10 digit phone number" placeholder="PHONE NUMBER (10 digits)" aria-label="Phone Number"
                   className="w-full bg-background border border-primary/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#DFAA9D]/40 focus:border-[#DFAA9D] transition-all min-h-[44px]" />
               </div>
 

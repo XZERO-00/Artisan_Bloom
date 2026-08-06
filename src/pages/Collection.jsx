@@ -93,13 +93,14 @@ export const Collection = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch('/api/products.json')
-      .then(res => res.json())
-      .then(data => {
-        setProducts(data);
-        setTimeout(() => setIsLoading(false), 500);
-      })
-      .catch(() => setIsLoading(false));
+    import('../services/productService').then(({ productService }) => {
+      productService.getAllProducts()
+        .then(data => {
+          setProducts(data);
+          setTimeout(() => setIsLoading(false), 500);
+        })
+        .catch(() => setIsLoading(false));
+    });
   }, [rawSearchQuery, initialCategory]);
 
   const filteredProducts = useMemo(() => {

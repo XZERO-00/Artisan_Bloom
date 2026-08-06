@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Package, MapPin, MessageCircle, ChevronRight, ShoppingBag } from 'lucide-react';
+import { Package, MapPin, MessageCircle, ChevronRight, ShoppingBag, Heart, Bell, Settings } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useOrderStore } from '../../store/useOrderStore';
 import { useChatStore } from '../../store/useChatStore';
@@ -14,13 +14,17 @@ export const CustomerProfile = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [activeChatThread, setActiveChatThread] = useState(null);
 
-  const userOrders = orderStore?.orders?.filter(o => o.userId === user?.id) || [];
-  const chatThreads = getThreadsForUser(user?.id, 'customer');
-  const unreadCount = getUnreadCount(user?.id, 'customer');
+  const userOrders = orderStore?.orders?.filter(o => o.userId === user?.uid || o.customerId === user?.uid) || [];
+  const chatThreads = getThreadsForUser(user?.uid, 'customer');
+  const unreadCount = getUnreadCount(user?.uid, 'customer');
 
   const tabs = [
     { id: 'orders', label: 'My Orders', icon: Package },
+    { id: 'wishlist', label: 'Wishlist', icon: Heart },
+    { id: 'addresses', label: 'Saved Addresses', icon: MapPin },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'chats', label: 'Messages', icon: MessageCircle, badge: unreadCount },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   const openChat = (threadId) => {
@@ -43,12 +47,12 @@ export const CustomerProfile = () => {
       </motion.div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b border-black/5">
+      <div className="flex gap-2 mb-6 border-b border-black/5 overflow-x-auto custom-scrollbar-hide">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative ${
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative whitespace-nowrap ${
               activeTab === tab.id ? 'text-primary' : 'text-textLight hover:text-textMain'
             }`}
           >
@@ -115,7 +119,7 @@ export const CustomerProfile = () => {
             </div>
           ) : (
             chatThreads.map(thread => {
-              const lastMsg = thread.messages[thread.messages.length - 1];
+              const lastMsg = thread.messages?.[thread.messages.length - 1];
               const unread = thread.unreadByCustomer;
               return (
                 <button
@@ -139,6 +143,55 @@ export const CustomerProfile = () => {
               );
             })
           )}
+        </motion.div>
+      )}
+
+      {/* Wishlist Tab */}
+      {activeTab === 'wishlist' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16 text-textLight">
+          <Heart className="w-12 h-12 mx-auto mb-3 opacity-30" />
+          <p className="font-medium">Your Wishlist is empty.</p>
+          <p className="text-sm mt-1">Save your favorite items for later!</p>
+        </motion.div>
+      )}
+
+      {/* Saved Addresses Tab */}
+      {activeTab === 'addresses' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16 text-textLight">
+          <MapPin className="w-12 h-12 mx-auto mb-3 opacity-30" />
+          <p className="font-medium">No saved addresses.</p>
+          <p className="text-sm mt-1">Add an address during checkout to save it here.</p>
+        </motion.div>
+      )}
+
+      {/* Notifications Tab */}
+      {activeTab === 'notifications' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16 text-textLight">
+          <Bell className="w-12 h-12 mx-auto mb-3 opacity-30" />
+          <p className="font-medium">No new notifications.</p>
+          <p className="text-sm mt-1">You're all caught up!</p>
+        </motion.div>
+      )}
+
+      {/* Settings Tab */}
+      {activeTab === 'settings' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-surface rounded-2xl p-6 border border-black/5">
+          <h3 className="font-semibold text-textMain mb-4">Profile Settings</h3>
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="fullName" className="block text-xs font-bold uppercase text-textLight mb-1">Full Name</label>
+              <input id="fullName" type="text" defaultValue={user?.name} disabled className="w-full bg-background border border-black/5 rounded-xl px-4 py-2 text-sm text-textMain" />
+            </div>
+            <div>
+              <label htmlFor="email" className="block text-xs font-bold uppercase text-textLight mb-1">Email Address</label>
+              <input id="email" type="email" defaultValue={user?.email} disabled className="w-full bg-background border border-black/5 rounded-xl px-4 py-2 text-sm text-textMain opacity-70" />
+            </div>
+            <div>
+              <label htmlFor="phone" className="block text-xs font-bold uppercase text-textLight mb-1">Phone Number</label>
+              <input id="phone" type="tel" defaultValue={user?.phone || ''} disabled className="w-full bg-background border border-black/5 rounded-xl px-4 py-2 text-sm text-textMain" placeholder="Not provided" />
+            </div>
+          </div>
+          <p className="text-xs text-textLight mt-4 italic">Settings are currently read-only in this beta version.</p>
         </motion.div>
       )}
 

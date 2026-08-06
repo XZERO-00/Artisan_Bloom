@@ -1,101 +1,90 @@
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  sendPasswordResetEmail,
-} from 'firebase/auth';
-import {
-  doc,
-  setDoc,
-  getDoc,
-  getDocs,
-  updateDoc,
-  collection,
-  serverTimestamp,
-} from 'firebase/firestore';
-import { auth, db } from '../lib/firebase';
+const API_URL = 'http://localhost:3001/api';
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
-/** Fetch the public profile document for a given Firebase UID. */
-export const getUserProfile = async (uid) => {
-  const snap = await getDoc(doc(db, 'users', uid));
-  return snap.exists() ? { uid, ...snap.data() } : null;
+const getHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { Authorization: `Bearer ${token}` })
+  };
 };
 
-// ─── Auth Service ────────────────────────────────────────────────────────────
-
 export const authService = {
-  /**
-   * Register a new user.
-   * Creates a Firebase Auth account AND a Firestore `users/{uid}` document.
-   */
+  loginWithGoogle: async () => {
+    throw new Error('Google Login is currently disabled.');
+  },
+
   register: async (userData) => {
-    const { email, password, fullName, phone, role = 'customer', shopName = '', shopBio = '' } = userData;
-
-    // 1. Create account in Firebase Auth
-    const credential = await createUserWithEmailAndPassword(auth, email, password);
-    const uid = credential.user.uid;
-
-    // 2. Write profile doc in Firestore
-    const profileDoc = {
-      name: fullName,
-      email,
-      phone,
-      role,
-      shopName: role === 'vendor' ? (shopName || `${fullName}'s Shop`) : null,
-      shopBio: role === 'vendor' ? (shopBio || '') : null,
-      avatar: null,
-      isApproved: true,   // Auto-approve; flip to false for manual vendor review workflow
-      isBanned: false,
-      createdAt: serverTimestamp(),
-    };
-
-    await setDoc(doc(db, 'users', uid), profileDoc);
-
+    const res = await fetch(`${API_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData)
+    });
+    
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Registration failed');
+    
+    localStorage.setItem('token', data.token);
     return { success: true, message: 'Registration successful! Welcome to The CraftNest.' };
   },
 
-  /**
-   * Login an existing user.
-   * Returns the Firebase auth credential + the Firestore profile.
-   */
   login: async (email, password) => {
-    const credential = await signInWithEmailAndPassword(auth, email, password);
-    const profile = await getUserProfile(credential.user.uid);
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
 
-    if (!profile) throw new Error('Account profile not found. Please contact support.');
-    if (profile.isBanned) throw new Error('Your account has been suspended. Contact support.');
-
-    return {
-      success: true,
-      firebaseUser: credential.user,
-      profile,
-    };
-  },
-
-  /** Sign the current user out of Firebase Auth. */
-  logout: async () => {
-    await signOut(auth);
-  },
-
-  /** Send a password reset email via Firebase Auth. */
-  resetPassword: async (email) => {
-    await sendPasswordResetEmail(auth, email);
-    return { success: true, message: 'Password reset link sent to your email.' };
-  },
-
-  // ─── Admin-only helpers ─────────────────────────────────────────────────
-
-  /** Fetch all users (should only be called from AdminProfile behind role check). */
-  getAllUsers: async () => {
-    const snap = await getDocs(collection(db, 'users'));
-    return snap.docs.map(d => ({ uid: d.id, ...d.data() }));
-  },
-
-  /** Update arbitrary fields on a user document (ban, approve, etc.). */
-  updateUserStatus: async (uid, updates) => {
-    await updateDoc(doc(db, 'users', uid), updates);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+    
+    localStorage.setItem('token', data.token);
     return { success: true };
   },
+
+  logout: async () => {
+    localStorage.removeItem('token');
+  },
+
+  getUserProfile: async () => {
+    const res = await fetch(`${API_URL}/auth/me`, { headers: getHeaders() });
+    if (!res.ok) throw new Error('Failed to fetch profile');
+    return await res.json();
+  },
+
+  resetPassword: async (email) => {
+    return { success: true, message: 'Password reset link sent to your email (Mocked).' };
+  },
+
+  getAllUsers: async () => {
+    const res = await fetch(`${API_URL}/users`, { headers: getHeaders() });
+    if (!res.ok) throw new Error('Failed to fetch users');
+    return await res.json();
+  },
+
+  updateUserStatus: async (uid, updates) => {
+    const res = await fetch(`${API_URL}/users/${uid}/status`, {
+      method: 'PATCH',
+      headers: getHeaders(),
+      body: JSON.stringify(updates)
+    });
+    if (!res.ok) throw new Error('Failed to update user');
+    return { success: true };
+  },
+
+  uploadImage: async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_URL}/upload`, {
+      method: 'POST',
+      headers: { ...(token && { Authorization: `Bearer ${token}` }) },
+      body: formData
+    });
+    
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Upload failed');
+    return data.url;
+  }
 };
+

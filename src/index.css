@@ -5,8 +5,34 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-background: 250 248 245; /* #FAF8F5 */
+    --color-surface: 255 255 255; /* #FFFFFF */
+    --color-primary: 234 200 185; /* #EAC8B9 */
+    --color-primary-hover: 223 170 157; /* #DFAA9D */
+    --color-text-main: 74 74 74; /* #4A4A4A */
+    --color-text-light: 122 122 122; /* #7A7A7A */
+    --color-card-beige: 241 233 228; /* #F1E9E4 */
+    --color-card-green: 224 231 226; /* #E0E7E2 */
+    --color-card-brown: 223 209 203; /* #DFD1CB */
+    --color-card-dark-beige: 220 207 198; /* #DCCFC6 */
+  }
+
+  .dark {
+    --color-background: 24 24 27; /* zinc-900 */
+    --color-surface: 39 39 42; /* zinc-800 */
+    --color-primary: 234 200 185; /* keep primary branding */
+    --color-primary-hover: 223 170 157; 
+    --color-text-main: 244 244 245; /* zinc-50 */
+    --color-text-light: 161 161 170; /* zinc-400 */
+    --color-card-beige: 58 52 49; 
+    --color-card-green: 49 56 51; 
+    --color-card-brown: 56 46 42; 
+    --color-card-dark-beige: 53 43 38; 
+  }
+
   body {
-    @apply bg-background text-textMain antialiased;
+    @apply bg-background text-textMain antialiased transition-colors duration-300;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -25,5 +51,13 @@
   .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+  
+  .glass {
+    @apply bg-surface/70 backdrop-blur-md border border-white/20 dark:border-white/10;
+  }
+  
+  .glass-panel {
+    @apply bg-background/60 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-soft;
   }
 }

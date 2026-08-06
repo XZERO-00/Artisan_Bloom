@@ -1,88 +1,81 @@
-/**
- * useOrderStore — Firestore backed
- * Replaces the old Zustand persist (localStorage) order store.
- *
- * Firestore schema:
- *   orders/{orderId}
- *     userId, userEmail, items[], total, shipping{}, paymentMethod, status, createdAt
- */
 import { create } from 'zustand';
-import {
-  collection, addDoc, query, where,
-  orderBy, onSnapshot, serverTimestamp, doc, updateDoc,
-} from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { socket } from '../lib/socket';
+
+const API_URL = 'http://localhost:3001/api/orders';
+
+const getHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { Authorization: `Bearer ${token}` })
+  };
+};
 
 export const useOrderStore = create((set, get) => ({
   orders: [],
-  _unsubscribe: null,
 
-  /**
-   * Place a new order — writes to Firestore.
-   * Returns the newly created document ID.
-   */
   addOrder: async (orderData) => {
-    const ref = await addDoc(collection(db, 'orders'), {
-      ...orderData,
-      status: 'Processing',
-      createdAt: serverTimestamp(),
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(orderData)
     });
-    return ref.id;
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to place order');
+    return data.orderId;
   },
 
-  /**
-   * Subscribe to all orders belonging to a user (by UID).
-   * Updates `orders` in real-time via onSnapshot.
-   * Returns the unsubscribe function.
-   */
+  fetchOrders: async () => {
+    try {
+      const res = await fetch(API_URL, { headers: getHeaders() });
+      if (res.ok) {
+        const orders = await res.json();
+        set({ orders });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
   subscribeToUserOrders: (userId) => {
-    // Clean up any existing listener
-    get()._unsubscribe?.();
+    get().fetchOrders();
 
-    const q = query(
-      collection(db, 'orders'),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
-    );
+    const handleUpdate = () => get().fetchOrders();
 
-    const unsub = onSnapshot(q, (snap) => {
-      const orders = snap.docs.map(d => ({
-        id: d.id,
-        ...d.data(),
-        // Convert Firestore Timestamp → JS Date string for display
-        date: d.data().createdAt?.toDate?.().toISOString() || new Date().toISOString(),
-      }));
-      set({ orders });
-    });
+    socket.on('new_order', handleUpdate);
+    socket.on('order_status_update', handleUpdate);
 
-    set({ _unsubscribe: unsub });
-    return unsub;
+    return () => {
+      socket.off('new_order', handleUpdate);
+      socket.off('order_status_update', handleUpdate);
+    };
   },
 
-  /**
-   * Admin only — subscribe to ALL orders across all users.
-   */
   subscribeToAllOrders: () => {
-    get()._unsubscribe?.();
-    const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-    const unsub = onSnapshot(q, (snap) => {
-      const orders = snap.docs.map(d => ({
-        id: d.id,
-        ...d.data(),
-        date: d.data().createdAt?.toDate?.().toISOString() || new Date().toISOString(),
-      }));
-      set({ orders });
-    });
-    set({ _unsubscribe: unsub });
-    return unsub;
+    get().fetchOrders();
+
+    const handleUpdate = () => get().fetchOrders();
+
+    socket.on('new_order', handleUpdate);
+    socket.on('order_status_update', handleUpdate);
+
+    return () => {
+      socket.off('new_order', handleUpdate);
+      socket.off('order_status_update', handleUpdate);
+    };
   },
 
   updateOrderStatus: async (orderId, status) => {
-    await updateDoc(doc(db, 'orders', orderId), { status });
+    const res = await fetch(`${API_URL}/${orderId}/status`, {
+      method: 'PATCH',
+      headers: getHeaders(),
+      body: JSON.stringify({ status })
+    });
+    if (!res.ok) throw new Error('Failed to update status');
   },
 
   cleanup: () => {
-    get()._unsubscribe?.();
-    set({ orders: [], _unsubscribe: null });
+    set({ orders: [] });
   },
 }));
+

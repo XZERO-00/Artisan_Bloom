@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 export const Button = ({ children, variant = 'primary', className = '', ...props }) => {
-  const baseStyles = "px-6 py-2.5 rounded-full font-medium transition-all duration-300 ease-out flex items-center justify-center cursor-pointer disabled:opacity-50";
+  const baseStyles = "px-6 py-2.5 rounded-full font-medium transition-all duration-300 ease-out flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background";
   
   const variants = {
     primary: "bg-primary text-white hover:bg-primaryHover shadow-soft hover:shadow-minimal",

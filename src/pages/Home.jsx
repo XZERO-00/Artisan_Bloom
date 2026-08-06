@@ -43,25 +43,28 @@ export const Home = () => {
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section className="relative w-full overflow-hidden bg-background pt-4 md:pt-8 pb-10 md:pb-16 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto relative h-[60vh] md:h-[70vh] min-h-[400px] md:min-h-[500px] rounded-[2rem] md:rounded-[3rem] overflow-hidden clip-path-curved shadow-soft">
+      <section className="relative w-full overflow-hidden pt-4 md:pt-8 pb-10 md:pb-16 px-4 md:px-8">
+        <div className="max-w-7xl mx-auto relative h-[60vh] md:h-[70vh] min-h-[400px] md:min-h-[500px] rounded-[2rem] md:rounded-[3rem] overflow-hidden glass-panel shadow-2xl border border-white/40 dark:border-white/10">
           
+          {/* Stunning Background Wallpaper */}
           <img 
-            src="https://images.unsplash.com/photo-1544928147-79a2dbc1f389?q=80&w=1600&auto=format&fit=crop" 
-            alt="Handmade Artisan Gifts" 
+            src="/artisan_hero_bg.png" 
+            alt="Beautiful Crafted Goods" 
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-multiply"
+            className="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-overlay dark:opacity-30"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#F1E9E4] via-[#F1E9E4]/60 to-[#F1E9E4]/30"></div>
+
+          {/* Subtle overlay to enhance text readability over the animated background */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/10 to-black/5 dark:from-black/60 dark:via-black/40 dark:to-black/20 pointer-events-none"></div>
           
           <div className="relative h-full flex flex-col items-center justify-center text-center px-4 max-w-4xl mx-auto z-10">
             <motion.h1 
               initial={{ opacity: 0, scale: 0.9, rotate: -2, y: 40 }}
               animate={{ opacity: 1, scale: 1, rotate: 0, y: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="text-5xl md:text-5xl lg:text-7xl font-serif font-bold text-textMain mb-4 md:mb-6 leading-tight drop-shadow-sm"
+              className="text-4xl md:text-5xl lg:text-7xl font-serif font-bold text-textMain mb-4 md:mb-6 leading-tight drop-shadow-sm"
             >
-              Gifts that don't end up<br/>in the 're-gift' pile.
+              Discover Unique Creations<br/>Directly From Artisans.
             </motion.h1>
             
             <motion.p 
@@ -70,7 +73,7 @@ export const Home = () => {
               transition={{ type: "spring", stiffness: 150, damping: 15, delay: 0.2 }}
               className="text-lg md:text-xl text-textMain/90 mb-10 max-w-2xl font-medium drop-shadow-sm"
             >
-              Personalized, handmade, and curated just for you. &hearts;
+              A curated marketplace empowering local makers. Shop personalized, handmade gifts directly from the creators themselves. &hearts;
             </motion.p>
             
             <motion.div

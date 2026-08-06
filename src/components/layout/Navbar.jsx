@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, ShoppingCart, Menu, X, Flower2, User, LogOut, Package } from 'lucide-react';
+import { Search, ShoppingCart, Menu, X, Flower2, User, LogOut, Package, Moon, Sun } from 'lucide-react';
 import { useCartStore } from '../../store/useCartStore';
 import { useAuthStore } from '../../store/useAuthStore';
+import { useThemeStore } from '../../store/useThemeStore';
 import { Button } from '../ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -15,11 +16,17 @@ export const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const cart = useCartStore((state) => state.cart);
   const { isAuthenticated, user, logout } = useAuthStore();
+  const { isDarkMode, toggleTheme } = useThemeStore();
   const navigate = useNavigate();
   const location = useLocation();
   
   const currentPath = location.pathname + location.search;
   const cartItemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+  
+  // Hide categories for vendors, on auth pages, or for unauthenticated users on the landing page
+  const hideOnPaths = ['/login', '/register'];
+  const isLandingAndUnauth = !isAuthenticated && location.pathname === '/';
+  const showCategories = user?.role !== 'vendor' && !hideOnPaths.includes(location.pathname) && !isLandingAndUnauth;
 
   const navLinks = [
     { name: 'Shop All', path: '/collections' },
@@ -80,43 +87,41 @@ export const Navbar = () => {
         <div className="flex justify-between items-center h-20">
           
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 shrink-0">
-            <Flower2 className="h-8 w-8 text-primary" strokeWidth={1.5} />
-            <div className="flex flex-col">
-              <span className="font-serif text-xl font-bold leading-none tracking-wide text-textMain">THE CRAFT</span>
-              <span className="font-serif text-[0.8rem] leading-none tracking-widest text-textLight">NEST</span>
-            </div>
+          <Link to="/" className="flex items-center space-x-2 shrink-0 transition-transform hover:scale-105">
+            <img src="/logo.png" alt="The CraftNest" className="h-16 w-auto object-contain" />
           </Link>
 
           {/* Desktop Menu */}
-          <div 
-             className="hidden lg:flex flex-1 mx-4 overflow-x-auto pb-1 -mb-1 custom-scrollbar-hide"
-             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            <div className="bg-surface/60 backdrop-blur rounded-full px-2 py-1 flex items-center shadow-sm border border-black/5 whitespace-nowrap min-w-max m-auto">
-              {navLinks.map((link, idx) => {
-                const isActive = currentPath === link.path || (link.path === '/collections' && location.pathname === '/collections' && location.search === '');
-                return (
-                  <Link
-                    key={link.name}
-                    to={link.path}
-                    className={`relative px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                      isActive ? 'text-textMain' : 'text-textLight hover:text-textMain hover:bg-black/5'
-                    }`}
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="nav-pill"
-                        className="absolute inset-0 bg-primary/15 rounded-full -z-10"
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                      />
-                    )}
-                    {link.name}
-                  </Link>
-                );
-              })}
+          {showCategories && (
+            <div 
+               className="hidden lg:flex flex-1 mx-4 overflow-x-auto pb-1 -mb-1 custom-scrollbar-hide"
+               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              <div className="bg-surface/60 backdrop-blur rounded-full px-2 py-1 flex items-center shadow-sm border border-black/5 whitespace-nowrap min-w-max m-auto">
+                {navLinks.map((link, idx) => {
+                  const isActive = currentPath === link.path || (link.path === '/collections' && location.pathname === '/collections' && location.search === '');
+                  return (
+                    <Link
+                      key={link.name}
+                      to={link.path}
+                      className={`relative px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                        isActive ? 'text-textMain' : 'text-textLight hover:text-textMain hover:bg-black/5'
+                      }`}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="nav-pill"
+                          className="absolute inset-0 bg-primary/15 rounded-full -z-10"
+                          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                        />
+                      )}
+                      {link.name}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Icons & Actions */}
           <div className="flex items-center space-x-4 shrink-0">
@@ -148,12 +153,22 @@ export const Navbar = () => {
               <button 
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
                 className="relative z-10 text-textLight hover:text-textMain transition-colors p-2 min-h-[44px] min-w-[44px] flex items-center justify-center bg-transparent rounded-full hover:bg-surface"
+                aria-label="Toggle Search"
               >
                 {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
               </button>
             </div>
 
-            <Link to="/cart" className="relative text-textLight hover:text-textMain transition-colors p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-surface">
+            {/* Theme Toggle */}
+            <button 
+              onClick={toggleTheme}
+              className="relative text-textLight hover:text-textMain transition-colors p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-surface"
+              aria-label="Toggle Dark Mode"
+            >
+              {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+
+            <Link to="/cart" className="relative text-textLight hover:text-textMain transition-colors p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-surface" aria-label="Shopping Cart">
               <ShoppingCart className="h-5 w-5" />
               <AnimatePresence>
                 {cartItemCount > 0 && (
@@ -233,10 +248,17 @@ export const Navbar = () => {
             </div>
             
             {/* Mobile menu button */}
-            <div className="lg:hidden flex items-center p-1 rounded-full hover:bg-surface text-textLight hover:text-textMain ml-1 sm:ml-2">
+            <div className="lg:hidden flex items-center gap-1 p-1 rounded-full text-textLight ml-1 sm:ml-2">
+              <button 
+                onClick={toggleTheme}
+                className="transition-colors p-2 min-h-[44px] min-w-[44px] flex items-center justify-center hover:bg-surface hover:text-textMain rounded-full"
+                aria-label="Toggle Dark Mode"
+              >
+                {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </button>
               <button 
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="transition-colors p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="transition-colors p-2 min-h-[44px] min-w-[44px] flex items-center justify-center hover:bg-surface hover:text-textMain rounded-full"
                 aria-label="Open mobile menu"
               >
                 <Menu className="h-6 w-6" />
@@ -272,28 +294,33 @@ export const Navbar = () => {
                 <button 
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="p-2 -mr-2 text-textLight hover:text-textMain bg-transparent rounded-full hover:bg-surface transition-colors"
+                  aria-label="Close mobile menu"
                 >
                   <X className="h-6 w-6" />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto py-4 px-4 space-y-1">
-                {navLinks.map((link) => {
-                  const isActive = currentPath === link.path || (link.path === '/collections' && location.pathname === '/collections' && location.search === '');
-                  return (
-                    <Link
-                      key={link.name}
-                      to={link.path}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors border-b border-black/5 last:border-0 ${
-                        isActive ? 'bg-primary/10 text-textMain font-bold' : 'text-textLight hover:bg-surface hover:text-textMain'
-                      }`}
-                    >
-                      {link.name}
-                    </Link>
-                  );
-                })}
-              </div>
+              {showCategories ? (
+                <div className="flex-1 overflow-y-auto py-4 px-4 space-y-1">
+                  {navLinks.map((link) => {
+                    const isActive = currentPath === link.path || (link.path === '/collections' && location.pathname === '/collections' && location.search === '');
+                    return (
+                      <Link
+                        key={link.name}
+                        to={link.path}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors border-b border-black/5 last:border-0 ${
+                          isActive ? 'bg-primary/10 text-textMain font-bold' : 'text-textLight hover:bg-surface hover:text-textMain'
+                        }`}
+                      >
+                        {link.name}
+                      </Link>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="flex-1" />
+              )}
 
               {/* Drawer Footer / Auth */}
               <div className="mt-auto p-6 border-t border-primary/20 bg-surface/30">

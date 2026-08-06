@@ -1,54 +1,32 @@
 import { create } from 'zustand';
-import {
-  collection, doc, addDoc, setDoc, updateDoc,
-  query, where, orderBy, onSnapshot, getDoc, getDocs,
-  serverTimestamp, increment,
-} from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { socket } from '../lib/socket';
 
-/**
- * Chat store backed by Firestore.
- *
- * Collections:
- *   threads/{threadId}           — thread metadata + unread counters
- *   threads/{threadId}/messages  — individual messages (ordered by timestamp)
- *
- * Listeners are stored in `_listeners` (not exposed to UI) and cleaned up
- * by calling the returned unsubscribe functions.
- */
+const API_URL = 'http://localhost:3001/api/chat';
+
+const getHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { Authorization: `Bearer ${token}` })
+  };
+};
+
 export const useChatStore = create((set, get) => ({
   threads: [],
   activeThreadId: null,
   activeMessages: [],
-  _unsubThreads: null,
-  _unsubMessages: null,
+  
+  _pollInterval: null,
 
-  // ─── Thread management ──────────────────────────────────────────────────
-
-  /**
-   * Get an existing thread between this customer+vendor+product, or create one.
-   * Returns the threadId.
-   */
-  getOrCreateThread: async ({ customerId, customerName, vendorId, vendorName, productId, productName }) => {
-    // Deterministic ID so duplicates are impossible
-    const threadId = `${customerId}_${vendorId}_${productId}`;
-    const threadRef = doc(db, 'threads', threadId);
-    const snap = await getDoc(threadRef);
-
-    if (!snap.exists()) {
-      await setDoc(threadRef, {
-        customerId, customerName,
-        vendorId, vendorName,
-        productId, productName,
-        unreadByVendor: 0,
-        unreadByCustomer: 0,
-        createdAt: serverTimestamp(),
-        lastMessageAt: serverTimestamp(),
-      });
-    }
-
-    set({ activeThreadId: threadId });
-    return threadId;
+  getOrCreateThread: async (threadData) => {
+    const res = await fetch(`${API_URL}/threads`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(threadData)
+    });
+    const data = await res.json();
+    set({ activeThreadId: data.threadId });
+    return data.threadId;
   },
 
   setActiveThread: (threadId) => {
@@ -56,92 +34,68 @@ export const useChatStore = create((set, get) => ({
   },
 
   clearActiveThread: () => {
-    // Clean up message listener
-    get()._unsubMessages?.();
-    set({ activeThreadId: null, activeMessages: [], _unsubMessages: null });
+    set({ activeThreadId: null, activeMessages: [] });
   },
 
-  // ─── Real-time listeners ────────────────────────────────────────────────
+  fetchThreads: async () => {
+    try {
+      const res = await fetch(`${API_URL}/threads`, { headers: getHeaders() });
+      if (res.ok) set({ threads: await res.json() });
+    } catch (err) {
+      console.error(err);
+    }
+  },
 
-  /**
-   * Subscribe to all threads for a user (by role).
-   * Updates `threads` in real-time.
-   */
   subscribeToUserThreads: (userId, role) => {
-    // Unsubscribe from any previous listener
-    get()._unsubThreads?.();
-
-    const field = role === 'vendor' ? 'vendorId' : 'customerId';
-    const q = query(
-      collection(db, 'threads'),
-      where(field, '==', userId),
-      orderBy('lastMessageAt', 'desc')
-    );
-
-    const unsub = onSnapshot(q, (snap) => {
-      const threads = snap.docs.map(d => ({ threadId: d.id, ...d.data() }));
-      set({ threads });
-    });
-
-    set({ _unsubThreads: unsub });
-    return unsub;
+    get().fetchThreads();
+    const interval = setInterval(() => get().fetchThreads(), 5000);
+    set({ _pollInterval: interval });
+    return () => clearInterval(interval);
   },
 
-  /**
-   * Subscribe to messages inside the active thread.
-   * Updates `activeMessages` in real-time.
-   */
+  fetchMessages: async (threadId) => {
+    try {
+      const res = await fetch(`${API_URL}/threads/${threadId}/messages`, { headers: getHeaders() });
+      if (res.ok) set({ activeMessages: await res.json() });
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
   subscribeToMessages: (threadId) => {
-    get()._unsubMessages?.();
+    get().fetchMessages(threadId);
+    
+    const handleMessage = (msg) => {
+      set(state => ({ activeMessages: [...state.activeMessages, msg] }));
+      get().fetchThreads(); 
+    };
 
-    const q = query(
-      collection(db, 'threads', threadId, 'messages'),
-      orderBy('timestamp', 'asc')
-    );
+    socket.on(`chat_message_${threadId}`, handleMessage);
 
-    const unsub = onSnapshot(q, (snap) => {
-      const messages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      set({ activeMessages: messages });
-    });
-
-    set({ _unsubMessages: unsub });
-    return unsub;
+    return () => {
+      socket.off(`chat_message_${threadId}`, handleMessage);
+    };
   },
-
-  // ─── Messaging ──────────────────────────────────────────────────────────
 
   sendMessage: async (threadId, { senderId, senderName, text, senderRole }) => {
     if (!threadId || !text.trim()) return;
-
-    const messagesRef = collection(db, 'threads', threadId, 'messages');
-    await addDoc(messagesRef, {
-      senderId,
-      senderName,
-      text: text.trim(),
-      timestamp: serverTimestamp(),
-    });
-
-    // Update thread metadata and unread counter for the OTHER party
-    const threadRef = doc(db, 'threads', threadId);
-    await updateDoc(threadRef, {
-      lastMessageAt: serverTimestamp(),
-      ...(senderRole === 'customer'
-        ? { unreadByVendor: increment(1) }
-        : { unreadByCustomer: increment(1) }),
+    
+    await fetch(`${API_URL}/threads/${threadId}/messages`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ text, senderName, senderRole })
     });
   },
 
   markAsRead: async (threadId, role) => {
     if (!threadId) return;
-    const threadRef = doc(db, 'threads', threadId);
-    await updateDoc(threadRef, {
-      ...(role === 'vendor'
-        ? { unreadByVendor: 0 }
-        : { unreadByCustomer: 0 }),
+    await fetch(`${API_URL}/threads/${threadId}/read`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ role })
     });
+    get().fetchThreads(); 
   },
-
-  // ─── Derived helpers ────────────────────────────────────────────────────
 
   getUnreadCount: (userId, role) => {
     return get().threads.reduce((acc, t) => {
@@ -152,6 +106,7 @@ export const useChatStore = create((set, get) => ({
   },
 
   getThreadsForUser: (userId, role) => {
-    return get().threads; // Already filtered by subscribeToUserThreads
+    return get().threads;
   },
 }));
+

@@ -26,69 +26,40 @@ export const Preloader = ({ onComplete }) => {
       <div className="flex flex-col items-center justify-center">
          
          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="mb-8"
+            initial={{ scale: 0.5, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+            className="mb-8 relative flex items-center justify-center"
          >
-            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#DFAA9D" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              {/* Bottom Nest Foundation */}
-              <motion.path 
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 1.5, ease: "easeInOut", delay: 0.2 }}
-                d="M4 14c0 5 16 5 16 0"
-              />
-              {/* Inner Woven Twig */}
-              <motion.path 
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 1.3, ease: "easeInOut", delay: 0.4 }}
-                d="M6 12c0 4 12 4 12 0"
-              />
-              {/* Sweeping Overlapping Curve */}
-              <motion.path 
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 1.2, ease: "easeInOut", delay: 0.6 }}
-                d="M3 13q9 4 18-1"
-              />
-              {/* Craft Needle / Accent Twig */}
-              <motion.path 
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 1.0, ease: "easeInOut", delay: 0.8 }}
-                d="M17 6L8 16"
-              />
-              {/* Small Yarn / Egg element */}
-              <motion.path 
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.8, ease: "easeInOut", delay: 1.0 }}
-                d="M12 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"
-              />
-            </svg>
+            <motion.img 
+              src="/logo.png" 
+              alt="The CraftNest Logo" 
+              className="w-48 h-48 md:w-56 md:h-56 object-contain drop-shadow-xl z-10"
+              animate={{ y: [0, -10, 0] }}
+              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+            />
+            {/* Spinning decorative ring to match the circular logo */}
+            <motion.div 
+              animate={{ rotate: 360 }} 
+              transition={{ repeat: Infinity, duration: 12, ease: "linear" }}
+              className="absolute inset-0 -m-4 border-[2px] border-dashed border-[#DFAA9D]/40 rounded-full"
+            />
+            <motion.div 
+              animate={{ rotate: -360 }} 
+              transition={{ repeat: Infinity, duration: 18, ease: "linear" }}
+              className="absolute inset-0 -m-8 border-[1px] border-[#DFAA9D]/20 rounded-full"
+            />
          </motion.div>
          
-         <div className="overflow-hidden flex items-center justify-center mb-1">
-           <motion.h1 
-             initial={{ y: "100%" }}
-             animate={{ y: 0 }}
-             transition={{ duration: 0.8, ease: [0.33, 1, 0.68, 1], delay: 0.4 }}
-             className="text-4xl md:text-5xl font-serif text-textMain tracking-[0.2em] font-bold"
+         <div className="overflow-hidden flex items-center justify-center mt-4">
+           <motion.p 
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             transition={{ duration: 1, delay: 0.8 }}
+             className="text-sm md:text-base font-medium text-textLight tracking-[0.3em] uppercase"
            >
-             THE CRAFT
-           </motion.h1>
-         </div>
-         <div className="overflow-hidden flex items-center justify-center">
-           <motion.h1 
-             initial={{ y: "100%" }}
-             animate={{ y: 0 }}
-             transition={{ duration: 0.8, ease: [0.33, 1, 0.68, 1], delay: 0.6 }}
-             className="text-4xl md:text-5xl font-serif text-[#DFAA9D] tracking-[0.2em]"
-           >
-             NEST
-           </motion.h1>
+             Handmade &bull; Heartfelt &bull; Unique
+           </motion.p>
          </div>
          
       </div>
