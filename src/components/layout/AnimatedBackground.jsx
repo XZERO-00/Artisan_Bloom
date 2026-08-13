@@ -14,78 +14,52 @@ export const AnimatedBackground = () => {
   // If the user prefers reduced motion, render a subtle static gradient instead of animations
   if (prefersReducedMotion) {
     return (
-      <div className="fixed inset-0 z-[-1] bg-gradient-to-br from-background via-cardBeige/30 to-primary/10"></div>
+      <div className="fixed inset-0 z-[-1] bg-gradient-to-br from-background via-surface to-background"></div>
     );
   }
 
   return (
     <div className="fixed inset-0 z-[-1] overflow-hidden bg-background pointer-events-none">
-      {/* Premium site-wide background wallpaper */}
-      <div 
-        className="absolute inset-0 opacity-50 dark:opacity-30 pointer-events-none transition-opacity duration-1000" 
-        style={{ 
-          backgroundImage: 'url(/artisan_hero_bg.png)', 
-          backgroundSize: 'cover', 
-          backgroundPosition: 'center',
-          filter: 'blur(16px)',
-          transform: 'scale(1.05)' // Prevents blur edges from showing
-        }}
-      ></div>
-
-      {/* Background base mesh overlay to ensure readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-cardBeige/70 via-background/80 to-background dark:from-surface/80 dark:via-background/90 dark:to-background"></div>
-
       {/* Animated Blob 1 - Top Right - Primary Color */}
       <motion.div
         animate={{
-          x: [0, 50, 0, -30, 0],
-          y: [0, -40, 20, 0, 0],
-          scale: [1, 1.1, 0.9, 1.05, 1],
-          rotate: [0, 45, -20, 10, 0],
+          x: [0, 20, 0, -10, 0],
+          y: [0, -20, 10, 0, 0],
+          scale: [1, 1.02, 0.98, 1.01, 1],
         }}
         transition={{
-          duration: 25,
+          duration: 35,
           ease: "easeInOut",
           repeat: Infinity,
           repeatType: "reverse"
         }}
-        className="absolute -top-[10%] -right-[5%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-primary/20 blur-[100px] mix-blend-multiply dark:mix-blend-screen opacity-70"
+        className="absolute -top-[10%] -right-[5%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full bg-primary/5 blur-[120px] mix-blend-multiply dark:mix-blend-screen opacity-40"
       />
 
       {/* Animated Blob 2 - Bottom Left - Card Dark Beige */}
       <motion.div
         animate={{
-          x: [0, -60, 20, -10, 0],
-          y: [0, 40, -30, 10, 0],
-          scale: [1, 0.9, 1.1, 0.95, 1],
-          rotate: [0, -30, 20, -10, 0],
+          x: [0, -30, 10, -5, 0],
+          y: [0, 20, -15, 5, 0],
+          scale: [1, 0.98, 1.02, 0.99, 1],
         }}
         transition={{
-          duration: 30,
+          duration: 40,
           ease: "easeInOut",
           repeat: Infinity,
           repeatType: "reverse",
           delay: 2
         }}
-        className="absolute -bottom-[15%] -left-[10%] w-[60vw] h-[60vw] max-w-[700px] max-h-[700px] rounded-full bg-cardDarkBeige/30 blur-[120px] mix-blend-multiply dark:mix-blend-screen opacity-60"
+        className="absolute -bottom-[15%] -left-[10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-cardDarkBeige/10 blur-[140px] mix-blend-multiply dark:mix-blend-screen opacity-30"
       />
 
-      {/* Animated Blob 3 - Middle Center (smaller) - Card Green */}
-      <motion.div
-        animate={{
-          x: [0, 30, -40, 20, 0],
-          y: [0, 60, -20, -50, 0],
-          scale: [0.8, 1.2, 0.9, 1.1, 0.8],
+      {/* Noise Texture Overlay for a premium matte feel */}
+      <div 
+        className="absolute inset-0 opacity-[0.015] dark:opacity-[0.03] mix-blend-overlay pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
         }}
-        transition={{
-          duration: 22,
-          ease: "easeInOut",
-          repeat: Infinity,
-          repeatType: "reverse",
-          delay: 5
-        }}
-        className="absolute top-[30%] left-[30%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full bg-cardGreen/20 blur-[90px] mix-blend-multiply dark:mix-blend-screen opacity-50"
-      />
+      ></div>
     </div>
   );
 };

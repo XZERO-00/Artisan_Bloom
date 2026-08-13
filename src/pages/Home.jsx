@@ -43,69 +43,73 @@ export const Home = () => {
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section className="relative w-full overflow-hidden pt-4 md:pt-8 pb-10 md:pb-16 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto relative h-[60vh] md:h-[70vh] min-h-[400px] md:min-h-[500px] rounded-[2rem] md:rounded-[3rem] overflow-hidden glass-panel shadow-2xl border border-white/40 dark:border-white/10">
+      <section className="relative w-full overflow-hidden pt-24 md:pt-32 pb-16 md:pb-24 px-4 md:px-8 flex flex-col items-center justify-center min-h-[75vh]">
+        <div className="max-w-5xl mx-auto flex flex-col items-center text-center z-10 relative">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+            className="px-4 py-1.5 rounded-full border border-black/10 dark:border-white/10 bg-surface/50 text-textLight text-xs md:text-sm font-medium tracking-widest uppercase mb-8 backdrop-blur-sm shadow-minimal"
+          >
+            The Premier Artisan Marketplace
+          </motion.div>
           
-          {/* Stunning Background Wallpaper */}
-          <img 
-            src="/artisan_hero_bg.png" 
-            alt="Beautiful Crafted Goods" 
-            loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-overlay dark:opacity-30"
-          />
-
-          {/* Subtle overlay to enhance text readability over the animated background */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/10 to-black/5 dark:from-black/60 dark:via-black/40 dark:to-black/20 pointer-events-none"></div>
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1], delay: 0.1 }}
+            className="text-5xl md:text-7xl lg:text-8xl font-serif text-textMain mb-6 leading-[1.1] tracking-tight"
+          >
+            Discover Unique <br className="hidden md:block"/> Handcrafted Goods.
+          </motion.h1>
           
-          <div className="relative h-full flex flex-col items-center justify-center text-center px-4 max-w-4xl mx-auto z-10">
-            <motion.h1 
-              initial={{ opacity: 0, scale: 0.9, rotate: -2, y: 40 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0, y: 0 }}
-              transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="text-4xl md:text-5xl lg:text-7xl font-serif font-bold text-textMain mb-4 md:mb-6 leading-tight drop-shadow-sm"
-            >
-              Discover Unique Creations<br/>Directly From Artisans.
-            </motion.h1>
-            
-            <motion.p 
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ type: "spring", stiffness: 150, damping: 15, delay: 0.2 }}
-              className="text-lg md:text-xl text-textMain/90 mb-10 max-w-2xl font-medium drop-shadow-sm"
-            >
-              A curated marketplace empowering local makers. Shop personalized, handmade gifts directly from the creators themselves. &hearts;
-            </motion.p>
-            
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ type: "spring", stiffness: 400, damping: 15, delay: 0.4 }}
-            >
-              <Link to="/collections">
-                <Button className="!px-8 !py-4 text-lg bg-[#DFAA9D] hover:bg-[#DFAA9D]/80 hover:shadow-lg transition-shadow">
-                  Browse the Collection
-                </Button>
-              </Link>
-            </motion.div>
-          </div>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1], delay: 0.2 }}
+            className="text-lg md:text-xl text-textLight mb-10 max-w-2xl font-sans font-light"
+          >
+            A curated space empowering local makers. Shop personalized, artisanal gifts directly from the creators themselves.
+          </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1], delay: 0.3 }}
+            className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
+          >
+            <Link to="/collections" className="w-full sm:w-auto">
+              <Button className="w-full !px-8 !py-4 text-base sm:text-lg">
+                Explore Collections
+              </Button>
+            </Link>
+            <Link to="/community" className="w-full sm:w-auto">
+              <Button variant="secondary" className="w-full !px-8 !py-4 text-base sm:text-lg">
+                Meet the Artisans
+              </Button>
+            </Link>
+          </motion.div>
         </div>
       </section>
 
-      {/* Shop by Vibe Section */}
-      <section className="py-20 px-4 md:px-8 max-w-7xl mx-auto overflow-hidden">
+      {/* Curated Selections Section */}
+      <section className="py-20 md:py-32 px-4 md:px-8 max-w-7xl mx-auto overflow-hidden border-t border-black/5 dark:border-white/5">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-col md:flex-row justify-between items-end mb-12"
+          transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
+          className="flex flex-col md:flex-row justify-between items-end mb-16"
         >
-          <div>
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-textMain">Shop by Vibe</h2>
-            <p className="mt-2 text-textLight">Find the perfect aesthetic for your loved ones.</p>
+          <div className="max-w-2xl">
+            <h2 className="text-4xl md:text-5xl font-serif text-textMain tracking-tight">Curated Selections</h2>
+            <p className="mt-4 text-lg text-textLight font-sans font-light">Explore our meticulously selected aesthetics to find the perfect addition to your home or the ideal gift for someone special.</p>
           </div>
-          <Link to="/collections" className="hidden md:flex text-primary hover:text-primaryHover font-medium items-center transition-colors">
-            View all categories &rarr;
+          <Link to="/collections" className="hidden md:flex text-textMain hover:text-primary font-medium items-center transition-colors group">
+            <span className="relative pb-1">
+              View all collections
+              <span className="absolute bottom-0 left-0 w-full h-[1px] bg-textMain group-hover:bg-primary transition-colors duration-300"></span>
+            </span>
           </Link>
         </motion.div>
         
@@ -116,26 +120,23 @@ export const Home = () => {
           variants={{
              visible: {
                transition: {
-                 staggerChildren: 0.15
+                 staggerChildren: 0.1
                }
              }
           }}
-          className="flex overflow-x-auto snap-x snap-mandatory pb-8 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
         >
-          {categories.map((category, idx) => (
-            <motion.div 
-               key={category.id}
-               variants={{
-                 hidden: { opacity: 0, y: 30 },
-                 visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
-               }}
-               className="min-w-[85vw] sm:min-w-[45vw] md:min-w-0 snap-center shrink-0"
-            >
-              <CategoryCard category={category} />
-            </motion.div>
+          {categories.map((category) => (
+            <CategoryCard key={category.id} category={category} />
           ))}
         </motion.div>
+        
+        <div className="mt-10 md:hidden flex justify-center">
+          <Link to="/collections" className="text-textMain font-medium pb-1 relative group">
+             View all collections
+             <span className="absolute bottom-0 left-0 w-full h-[1px] bg-textMain group-hover:bg-primary transition-colors duration-300"></span>
+          </Link>
+        </div>
       </section>
     </div>
   );

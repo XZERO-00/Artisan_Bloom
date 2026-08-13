@@ -77,10 +77,10 @@ export const Navbar = () => {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
           isScrolled 
-            ? 'bg-background/95 backdrop-blur-md shadow-md border-b-transparent' 
-            : 'bg-background/80 backdrop-blur-sm border-b border-surface/50'
+            ? 'bg-background/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5 shadow-minimal' 
+            : 'bg-transparent border-b border-transparent'
         }`}
       >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -97,25 +97,25 @@ export const Navbar = () => {
                className="hidden lg:flex flex-1 mx-4 overflow-x-auto pb-1 -mb-1 custom-scrollbar-hide"
                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              <div className="bg-surface/60 backdrop-blur rounded-full px-2 py-1 flex items-center shadow-sm border border-black/5 whitespace-nowrap min-w-max m-auto">
+              <div className="flex items-center gap-1 whitespace-nowrap min-w-max m-auto">
                 {navLinks.map((link, idx) => {
                   const isActive = currentPath === link.path || (link.path === '/collections' && location.pathname === '/collections' && location.search === '');
                   return (
                     <Link
                       key={link.name}
                       to={link.path}
-                      className={`relative px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                        isActive ? 'text-textMain' : 'text-textLight hover:text-textMain hover:bg-black/5'
+                      className={`relative px-4 py-2 text-sm font-medium transition-colors ${
+                        isActive ? 'text-textMain' : 'text-textLight hover:text-textMain'
                       }`}
                     >
+                      {link.name}
                       {isActive && (
                         <motion.div
-                          layoutId="nav-pill"
-                          className="absolute inset-0 bg-primary/15 rounded-full -z-10"
+                          layoutId="nav-underline"
+                          className="absolute bottom-1 left-4 right-4 h-[1.5px] bg-textMain"
                           transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                         />
                       )}
-                      {link.name}
                     </Link>
                   );
                 })}

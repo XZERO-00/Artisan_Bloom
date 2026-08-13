@@ -25,13 +25,13 @@ export default {
       },
       borderRadius: {
         '2xl': '1rem',
-        '3xl': '1.5rem',
-        '4xl': '2rem',
+        '3xl': '1.25rem', /* slightly less exaggerated */
+        '4xl': '1.5rem', /* slightly less exaggerated */
         'full': '9999px',
       },
       boxShadow: {
-        'soft': '0 4px 20px rgba(0, 0, 0, 0.05)',
-        'minimal': '0 2px 10px rgba(0, 0, 0, 0.02)',
+        'soft': '0 10px 40px -10px rgba(0, 0, 0, 0.03)',
+        'minimal': '0 4px 20px -2px rgba(0, 0, 0, 0.02)',
       }
     },
   },
