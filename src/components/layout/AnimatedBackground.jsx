@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 
 export const AnimatedBackground = () => {
   const prefersReducedMotion = useReducedMotion();
   const [isMounted, setIsMounted] = useState(false);
+  const { scrollY } = useScroll();
+  
+  // Transform scroll position into an opacity value.
+  // Full opacity at top, fades out significantly as you scroll down.
+  const opacity = useTransform(scrollY, [0, 600], [1, 0.1]);
+  // Subtle parallax effect for the background image
+  const y = useTransform(scrollY, [0, 1000], [0, 100]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -11,7 +18,7 @@ export const AnimatedBackground = () => {
 
   if (!isMounted) return null;
 
-  // If the user prefers reduced motion, render a subtle static gradient instead of animations
+  // If the user prefers reduced motion, render a subtle static gradient
   if (prefersReducedMotion) {
     return (
       <div className="fixed inset-0 z-[-1] bg-gradient-to-br from-background via-surface to-background"></div>
@@ -19,13 +26,31 @@ export const AnimatedBackground = () => {
   }
 
   return (
-    <div className="fixed inset-0 z-[-1] overflow-hidden bg-background pointer-events-none">
-      {/* Animated Blob 1 - Top Right - Primary Color */}
+    <div className="fixed inset-0 z-[-1] overflow-hidden bg-background pointer-events-none flex justify-center">
+      
+      {/* Premium Image Background */}
+      <motion.div
+        style={{ opacity, y }}
+        className="absolute inset-0 w-full max-w-[1920px] mx-auto h-[120vh] -top-[10vh]"
+      >
+        <div 
+          className="w-full h-full opacity-70 dark:opacity-40 mix-blend-multiply dark:mix-blend-screen transition-opacity duration-1000"
+          style={{
+            backgroundImage: 'url(/premium-bg.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'top center',
+            // Fade out the image at the bottom so it doesn't clash with content sections
+            maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)'
+          }}
+        />
+      </motion.div>
+
+      {/* Very soft ambient floating lights (subtle movement) */}
       <motion.div
         animate={{
-          x: [0, 20, 0, -10, 0],
-          y: [0, -20, 10, 0, 0],
-          scale: [1, 1.02, 0.98, 1.01, 1],
+          x: [0, 30, 0, -20, 0],
+          y: [0, -20, 15, 0, 0],
         }}
         transition={{
           duration: 35,
@@ -33,29 +58,12 @@ export const AnimatedBackground = () => {
           repeat: Infinity,
           repeatType: "reverse"
         }}
-        className="absolute -top-[10%] -right-[5%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full bg-primary/5 blur-[120px] mix-blend-multiply dark:mix-blend-screen opacity-40"
+        className="absolute top-0 right-[10%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full bg-primary/10 blur-[120px] mix-blend-multiply dark:mix-blend-screen opacity-40"
       />
 
-      {/* Animated Blob 2 - Bottom Left - Card Dark Beige */}
-      <motion.div
-        animate={{
-          x: [0, -30, 10, -5, 0],
-          y: [0, 20, -15, 5, 0],
-          scale: [1, 0.98, 1.02, 0.99, 1],
-        }}
-        transition={{
-          duration: 40,
-          ease: "easeInOut",
-          repeat: Infinity,
-          repeatType: "reverse",
-          delay: 2
-        }}
-        className="absolute -bottom-[15%] -left-[10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-cardDarkBeige/10 blur-[140px] mix-blend-multiply dark:mix-blend-screen opacity-30"
-      />
-
-      {/* Noise Texture Overlay for a premium matte feel */}
+      {/* Noise Texture Overlay for a premium matte finish */}
       <div 
-        className="absolute inset-0 opacity-[0.015] dark:opacity-[0.03] mix-blend-overlay pointer-events-none"
+        className="absolute inset-0 opacity-[0.02] dark:opacity-[0.04] mix-blend-overlay pointer-events-none"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
         }}
